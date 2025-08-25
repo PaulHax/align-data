@@ -1,0 +1,99 @@
+name: Auto Release
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Get latest tag
+        id: get_tag
+        run: |
+          # Get the latest tag, or default to v0.0.0 if no tags exist
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+          
+          # Parse version numbers
+          VERSION=${LATEST_TAG#v}
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+          
+          # Check for version bump hints in commit messages since last tag
+          COMMITS_SINCE_TAG=$(git rev-list ${LATEST_TAG}..HEAD --pretty=format:"%s" 2>/dev/null || git rev-list HEAD --pretty=format:"%s")
+          
+          if echo "$COMMITS_SINCE_TAG" | grep -q '\[major\]'; then
+            NEW_MAJOR=$((MAJOR + 1))
+            NEW_MINOR=0
+            NEW_PATCH=0
+          elif echo "$COMMITS_SINCE_TAG" | grep -q '\[minor\]'; then
+            NEW_MAJOR=$MAJOR
+            NEW_MINOR=$((MINOR + 1))
+            NEW_PATCH=0
+          else
+            NEW_MAJOR=$MAJOR
+            NEW_MINOR=$MINOR
+            NEW_PATCH=$((PATCH + 1))
+          fi
+          
+          NEW_VERSION="v${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "Latest tag: $LATEST_TAG"
+          echo "New version: $NEW_VERSION"
+      
+      - name: Check if release needed
+        id: check_release
+        run: |
+          # Check if there are any commits since the last tag
+          COMMITS_COUNT=$(git rev-list ${{ steps.get_tag.outputs.latest_tag }}..HEAD --count 2>/dev/null || git rev-list HEAD --count)
+          echo "commits_since_tag=$COMMITS_COUNT" >> $GITHUB_OUTPUT
+          
+          if [ "$COMMITS_COUNT" -eq "0" ]; then
+            echo "No commits since last tag, skipping release"
+            echo "should_release=false" >> $GITHUB_OUTPUT
+          else
+            echo "Found $COMMITS_COUNT commits since last tag, creating release"
+            echo "should_release=true" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Create tag and release
+        if: steps.check_release.outputs.should_release == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          NEW_VERSION="${{ steps.get_tag.outputs.new_version }}"
+          
+          # Create and push tag
+          git tag "$NEW_VERSION"
+          git push origin "$NEW_VERSION"
+          
+          # Generate release notes from commits since last tag
+          LAST_TAG="${{ steps.get_tag.outputs.latest_tag }}"
+          if [ "$LAST_TAG" = "v0.0.0" ]; then
+            RELEASE_NOTES="Initial release of align-data ICL datasets"
+          else
+            RELEASE_NOTES="## Changes since $LAST_TAG"$'\n\n'
+            git log ${LAST_TAG}..HEAD --pretty=format:"- %s (%h)" >> release_notes.txt
+            RELEASE_NOTES="$RELEASE_NOTES"$'\n'"$(cat release_notes.txt)"
+          fi
+          
+          # Create GitHub release
+          gh release create "$NEW_VERSION" \
+            --title "Release $NEW_VERSION" \
+            --notes "$RELEASE_NOTES" \
+            --generate-notes
+      
+      - name: Output release info
+        if: steps.check_release.outputs.should_release == 'true'
+        run: |
+          echo "✅ Created release ${{ steps.get_tag.outputs.new_version }}"
+          echo "📦 Download URL: https://github.com/${{ github.repository }}/archive/refs/tags/${{ steps.get_tag.outputs.new_version }}.tar.gz"
+          echo "🔗 Latest URL: https://github.com/${{ github.repository }}/releases/latest/download/${{ github.repository_owner }}-align-data.tar.gz"

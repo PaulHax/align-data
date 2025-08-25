@@ -1,0 +1,23 @@
+# Example Hydra overrides for Phase 2 Comparative Regression with July 2025 data
+# 
+# Usage: Copy these overrides and adjust the paths to your local align-data location
+# Example command line usage:
+#   run_align_system +experiment=YOUR_EXPERIMENT \
+#     adm.step_definitions.regression_icl.icl_generator_partial.incontext_settings.datasets.medical=/path/to/align-data/data/phase2_icl/July2025-MU-train_20250715.json \
+#     adm.step_definitions.regression_icl.icl_generator_partial.incontext_settings.datasets.affiliation=/path/to/align-data/data/phase2_icl/July2025-AF-train_20250715.json \
+#     # ... etc for other datasets
+#
+# Or create your own config file with these overrides and adjust paths:
+
+# REPLACE /path/to/align-data with your actual path to the align-data repository
+adm:
+  step_definitions:
+    regression_icl:
+      icl_generator_partial:
+        incontext_settings:
+          datasets:
+            medical: /path/to/align-data/data/phase2_icl/July2025-MU-train_20250715.json
+            affiliation: /path/to/align-data/data/phase2_icl/July2025-AF-train_20250715.json
+            merit: /path/to/align-data/data/phase2_icl/July2025-MF-train_20250715.json
+            personal_safety: /path/to/align-data/data/phase2_icl/July2025-PS-train_20250715.json
+            search: /path/to/align-data/data/phase2_icl/July2025-SS-train_20250715.json
