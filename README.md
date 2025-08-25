@@ -37,11 +37,11 @@ Use Hydra's command-line overrides to point to your local ICL data:
 ```bash
 # Run with individual overrides (adjust path to your align-data location)
 run_align_system +experiment=YOUR_EXPERIMENT \
-  adm.step_definitions.regression_icl.icl_generator_partial.incontext_settings.datasets.medical=/path/to/align-data/data/phase2_icl/July2025-MU-train_20250715.json \
-  adm.step_definitions.regression_icl.icl_generator_partial.incontext_settings.datasets.affiliation=/path/to/align-data/data/phase2_icl/July2025-AF-train_20250715.json \
-  adm.step_definitions.regression_icl.icl_generator_partial.incontext_settings.datasets.merit=/path/to/align-data/data/phase2_icl/July2025-MF-train_20250715.json \
-  adm.step_definitions.regression_icl.icl_generator_partial.incontext_settings.datasets.personal_safety=/path/to/align-data/data/phase2_icl/July2025-PS-train_20250715.json \
-  adm.step_definitions.regression_icl.icl_generator_partial.incontext_settings.datasets.search=/path/to/align-data/data/phase2_icl/July2025-SS-train_20250715.json
+  adm.step_definitions.regression_icl.icl_generator_partial.incontext_settings.datasets.medical=/path/to/align-data/data/phase2_icl/MU-train.json \
+  adm.step_definitions.regression_icl.icl_generator_partial.incontext_settings.datasets.affiliation=/path/to/align-data/data/phase2_icl/AF-train.json \
+  adm.step_definitions.regression_icl.icl_generator_partial.incontext_settings.datasets.merit=/path/to/align-data/data/phase2_icl/MF-train.json \
+  adm.step_definitions.regression_icl.icl_generator_partial.incontext_settings.datasets.personal_safety=/path/to/align-data/data/phase2_icl/PS-train.json \
+  adm.step_definitions.regression_icl.icl_generator_partial.incontext_settings.datasets.search=/path/to/align-data/data/phase2_icl/SS-train.json
 
 # Or create your own config file using the examples in configs/hydra_overrides/
 # (remember to replace /path/to/align-data with your actual path)
@@ -61,6 +61,20 @@ For applications like `align-app`, you can:
 
 When adding new ICL datasets:
 
-1. Add files to appropriate directories under `data/`
-2. Update this README
-3. Create a new release with semantic versioning
+1. Add files to appropriate directories under `data/` using descriptive names (e.g., `AF-train.json`, `MU-train.json`)
+2. Update this README and any relevant config examples
+3. Create a pull request to main branch
+
+### Releases
+
+Releases are automated! When your PR is merged to main:
+
+- A new git tag is automatically created with semantic versioning (e.g., v1.0.1)
+- GitHub releases are created with downloadable archives
+- Use git tags for version tracking rather than dates in filenames
+
+Version increment hints (optional):
+
+- Include `[major]` in commit message for breaking changes (v1.0.0 → v2.0.0)
+- Include `[minor]` in commit message for new features (v1.0.0 → v1.1.0)
+- Default: patch increment for fixes and updates (v1.0.0 → v1.0.1)
