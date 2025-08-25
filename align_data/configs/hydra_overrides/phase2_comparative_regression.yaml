@@ -1,23 +1,29 @@
 # Example Hydra overrides for Phase 2 Comparative Regression
 # 
+# Python package approach (automatic path resolution):
+#   from align_data import get_icl_data_paths
+#   datasets = get_icl_data_paths()
+#
+# Manual path specification:
 # Usage: Copy these overrides and adjust the paths to your local align-data location
 # Example command line usage:
 #   run_align_system +experiment=YOUR_EXPERIMENT \
-#     adm.step_definitions.regression_icl.icl_generator_partial.incontext_settings.datasets.medical=/path/to/align-data/data/phase2_icl/MU-train.json \
-#     adm.step_definitions.regression_icl.icl_generator_partial.incontext_settings.datasets.affiliation=/path/to/align-data/data/phase2_icl/AF-train.json \
+#     adm.step_definitions.regression_icl.icl_generator_partial.incontext_settings.datasets.medical=/path/to/align-data/align_data/data/phase2_icl/MU-train.json \
+#     adm.step_definitions.regression_icl.icl_generator_partial.incontext_settings.datasets.affiliation=/path/to/align-data/align_data/data/phase2_icl/AF-train.json \
 #     # ... etc for other datasets
 #
 # Or create your own config file with these overrides and adjust paths:
 
 # REPLACE /path/to/align-data with your actual path to the align-data repository
+# NOTE: Data files are now in align_data/data/ (not root data/)
 adm:
   step_definitions:
     regression_icl:
       icl_generator_partial:
         incontext_settings:
           datasets:
-            medical: /path/to/align-data/data/phase2_icl/MU-train.json
-            affiliation: /path/to/align-data/data/phase2_icl/AF-train.json
-            merit: /path/to/align-data/data/phase2_icl/MF-train.json
-            personal_safety: /path/to/align-data/data/phase2_icl/PS-train.json
-            search: /path/to/align-data/data/phase2_icl/SS-train.json
+            medical: /path/to/align-data/align_data/data/phase2_icl/MU-train.json
+            affiliation: /path/to/align-data/align_data/data/phase2_icl/AF-train.json
+            merit: /path/to/align-data/align_data/data/phase2_icl/MF-train.json
+            personal_safety: /path/to/align-data/align_data/data/phase2_icl/PS-train.json
+            search: /path/to/align-data/align_data/data/phase2_icl/SS-train.json
