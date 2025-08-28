@@ -1,0 +1,22 @@
+name: Trigger align-browser Deploy
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'align_data/data/evaluation-outputs/**'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  trigger-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Trigger align-browser workflow
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.ALIGN_BROWSER_PAT }}
+          repository: ITM-Kitware/align-browser
+          event-type: align-data-update
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
