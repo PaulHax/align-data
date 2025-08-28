@@ -24,3 +24,6 @@ venv/
 # Temporary files
 *.tmp
 *.bak
+
+# Evaluation output logs
+align_data/data/evaluation-outputs/**/*.log
